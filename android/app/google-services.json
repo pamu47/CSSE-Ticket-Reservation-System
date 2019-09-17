@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "730657340706",
+    "firebase_url": "https://csse-booking-system.firebaseio.com",
+    "project_id": "csse-booking-system",
+    "storage_bucket": "csse-booking-system.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:730657340706:android:1952a53d2686af8aa8f97b",
+        "android_client_info": {
+          "package_name": "com.example.csse_booking_system"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "730657340706-c907dnq9iqdgsdd0f8akd15jjcsbs0sv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBm7hSB_fxUm6OIysbw-xrC8dRvBoR7FYU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "730657340706-c907dnq9iqdgsdd0f8akd15jjcsbs0sv.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
