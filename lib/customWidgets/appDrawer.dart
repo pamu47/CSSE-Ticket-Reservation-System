@@ -6,8 +6,12 @@ import 'package:provider/provider.dart';
 
 class AppDrawer extends StatelessWidget {
   FirebaseUser user;
+  
+  AppDrawer(this.user);
+
   @override
   Widget build(BuildContext context) {
+    
     return Drawer(
       child: ListView(
         padding: EdgeInsets.zero,
@@ -22,7 +26,7 @@ class AppDrawer extends StatelessWidget {
               },
             ),
             accountEmail: Text("pamuditha@gmail.com"),
-            accountName: Text("Pamuditha"),
+            accountName: Text('${user.email}'),
             decoration: BoxDecoration(
               color: Color.fromRGBO(18, 69, 89, 1),
             ),
@@ -96,8 +100,8 @@ class AppDrawer extends StatelessWidget {
           ),
           Card(
             child: ListTile(
-              leading: Icon(FontAwesomeIcons.fileInvoiceDollar),
-              title: Text('logout'),
+              leading: Icon(FontAwesomeIcons.signOutAlt),
+              title: Text('Logout'),
               onTap: () async {
                 Navigator.pop(context);
                 // Navigator.push(context,
