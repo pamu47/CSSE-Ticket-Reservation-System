@@ -1,8 +1,8 @@
+import 'package:csse_booking_system/Homepage/home.dart';
 import 'package:csse_booking_system/auth/signIn.dart';
 import 'package:csse_booking_system/customWidgets/stacked_icons.dart';
 import 'package:csse_booking_system/services/usermanagement.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class SignUp extends StatefulWidget {
@@ -13,6 +13,7 @@ class SignUp extends StatefulWidget {
 }
 
 class SignUpState extends State<SignUp> {
+  BaseAuthentication auth = Authentication();
   var _formKey = GlobalKey<FormState>();
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
@@ -108,15 +109,18 @@ class SignUpState extends State<SignUp> {
                   child: Text("SignUp"),
                   onPressed: () {
                     if (_formKey.currentState.validate()) {
-                      FirebaseAuth.instance
-                          .createUserWithEmailAndPassword(
-                              email: emailController.text,
-                              password: passwordController.text)
-                          .then((signedInUser) {
-                        UserManagement().storeNewUser(signedInUser, context,nameController.text);
-                      }).catchError((e) {
-                        print(e);
-                      });
+
+                      Future<String> user = auth.signUp(
+                          emailController.text, passwordController.text);
+                      if (user != null) {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => Home()));
+                      } else {
+                        // Have to change
+                        //Navigator.pushNamed(context, '/home');
+                      }
                     }
                   },
                 ),
@@ -162,34 +166,29 @@ class SignUpState extends State<SignUp> {
                   },
                 ),
               ),
-               ButtonTheme(
-                      minWidth: 250,
-                      child: FlatButton.icon(
-                        color: Colors.red,
-                        icon: Icon(FontAwesomeIcons.google), //`Icon` to display
-                        label: Text('Continue with Google'), //`Text` to display
-                        onPressed: () {
-                          //Code to execute when Floating Action Button is clicked
-                          //...
-                        },
-                      ),
-                    ),
-                  
-                   ButtonTheme(
-                      minWidth: 250,
-                      child: FlatButton.icon(
-                        color: Color(0xff3399fe),
-                        icon:
-                            Icon(FontAwesomeIcons.facebook), //`Icon` to display
-                        label:
-                            Text('Continue with Facebook'), //`Text` to display
-                        onPressed: () {
-                          //Code to execute when Floating Action Button is clicked
-                          //...
-                        },
-                      ),
-                    ),
-                  
+              ButtonTheme(
+                minWidth: 250,
+                child: FlatButton.icon(
+                  color: Colors.red,
+                  icon: Icon(FontAwesomeIcons.google), //`Icon` to display
+                  label: Text('Continue with Google'), //`Text` to display
+                  onPressed: () {
+
+                  },
+                ),
+              ),
+              ButtonTheme(
+                minWidth: 250,
+                child: FlatButton.icon(
+                  color: Color(0xff3399fe),
+                  icon: Icon(FontAwesomeIcons.facebook), //`Icon` to display
+                  label: Text('Continue with Facebook'), //`Text` to display
+                  onPressed: () {
+                    //Code to execute when Floating Action Button is clicked
+                    //...
+                  },
+                ),
+              ),
             ],
           )),
     ]));

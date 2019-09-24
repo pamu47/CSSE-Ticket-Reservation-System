@@ -3,10 +3,6 @@ import 'package:csse_booking_system/auth/signUp.dart';
 import 'package:csse_booking_system/customWidgets/stacked_icons.dart';
 import 'package:csse_booking_system/services/usermanagement.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:provider/provider.dart';
-
-import 'auth.dart';
 
 class Login extends StatefulWidget {
   @override
@@ -16,6 +12,7 @@ class Login extends StatefulWidget {
 }
 
 class LoginState extends State<Login> {
+  BaseAuthentication auth = Authentication();
   var _formKey = GlobalKey<FormState>();
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
@@ -93,26 +90,7 @@ class LoginState extends State<Login> {
                   child: Text("Sign In"),
                   onPressed: () async {
                     if (_formKey.currentState.validate()) {
-                      // FirebaseAuth.instance.signInWithEmailAndPassword(email: emailController.text,password: passwordController.text)
-                      // .then((FirebaseUser user){
-                      //   // Navigator.pop(context);
-                      //   // Navigator.push(context, MaterialPageRoute(builder: (context) => Home()));
-                      //   Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => Home()));
-                      // }).catchError((e){
-                      //   print(e);
-                      // });
-
-                      try {
-                        FirebaseUser result =
-                            await Provider.of<AuthService>(context).loginUser(
-                                email: emailController.text,
-                                password: passwordController.text);
-                        print(result);
-                      } on AuthException catch (error) {
-                        return _buildErrorDialog(context, error.message);
-                      } on Exception catch (error) {
-                        return _buildErrorDialog(context, error.toString());
-                      }
+                      _userLogin();
                     }
                   },
                 ),
@@ -161,6 +139,29 @@ class LoginState extends State<Login> {
             ],
           )),
     ]));
+  }
+
+  Future _userLogin() async {
+    //Firebase remote config
+
+    //If auth is enabled in remote
+    // final formState = _formKey.currentState;
+    // if (formState.validate()) {
+    //   formState.save();
+
+    print(emailController.text);
+    print(passwordController.text);
+    Future<String> userId =
+        auth.signIn(emailController.text, passwordController.text);
+
+    userId.then((user) {
+      if (user.length > 0 && user != null) {
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => Home()));
+      } else {
+        print("User id is null");
+      }
+    });
   }
 }
 
