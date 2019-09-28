@@ -1,13 +1,21 @@
-import 'package:csse_booking_system/auth/auth.dart';
+import 'package:csse_booking_system/services/usermanagement.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:provider/provider.dart';
+
 
 class AppDrawer extends StatelessWidget {
-  FirebaseUser user;
+  //static BaseAuthentication auth = Authentication();
   
-  AppDrawer(this.user);
+  static FirebaseAuth auth = FirebaseAuth.instance;
+  static String userId;
+
+void getUser()async{
+    final FirebaseUser user = await auth.currentUser();
+    userId = user.uid;
+  }
+  AppDrawer();
+    
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +26,11 @@ class AppDrawer extends StatelessWidget {
         children: <Widget>[
           UserAccountsDrawerHeader(
             currentAccountPicture: InkWell(
-              child: Icon(Icons.account_circle, size: 75.0,color: Colors.white,),
+              child: Icon(
+                Icons.account_circle,
+                size: 75.0,
+                color: Colors.white,
+              ),
               onTap: () {
                 Navigator.pop(context);
                 // Navigator.push(context,
@@ -26,7 +38,7 @@ class AppDrawer extends StatelessWidget {
               },
             ),
             accountEmail: Text("pamuditha@gmail.com"),
-            accountName: Text('${user.email}'),
+            accountName: Text('abcd::::'),
             decoration: BoxDecoration(
               color: Color.fromRGBO(18, 69, 89, 1),
             ),
@@ -56,10 +68,9 @@ class AppDrawer extends StatelessWidget {
               leading: Icon(FontAwesomeIcons.userNurse),
               title: Text('Staff'),
               onTap: () {
-
                 Navigator.pop(context);
-                    //             Navigator.push(context,
-                    // MaterialPageRoute(builder: (context) => ));
+                //             Navigator.push(context,
+                // MaterialPageRoute(builder: (context) => ));
               },
             ),
           ),
@@ -79,10 +90,9 @@ class AppDrawer extends StatelessWidget {
               leading: Icon(Icons.message),
               title: Text('Messages'),
               onTap: () {
-
                 Navigator.pop(context);
-                    //             Navigator.push(context,
-                    // MaterialPageRoute(builder: (context) => ));
+                //             Navigator.push(context,
+                // MaterialPageRoute(builder: (context) => ));
               },
             ),
           ),
@@ -106,16 +116,7 @@ class AppDrawer extends StatelessWidget {
                 Navigator.pop(context);
                 // Navigator.push(context,
                 //     MaterialPageRoute(builder: (context) => ));
-
-                try {
-                        FirebaseUser result =
-                            await Provider.of<AuthService>(context).logout();
-                        print(result);
-                      } on AuthException catch (error) {
-                        return _buildErrorDialog(context, error.message);
-                      } on Exception catch (error) {
-                        return _buildErrorDialog(context, error.toString());
-                      }
+                auth.signOut();
               },
             ),
           ),

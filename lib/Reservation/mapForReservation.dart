@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:csse_booking_system/Reservation/busAvailability.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
@@ -15,7 +16,7 @@ class MapSampleState extends State<MapSample> with ChangeNotifier {
   static LatLng _initialPosition;
   LatLng _lastPosition = _initialPosition;
   final Set<Marker> _markers = {};
-   Set<Polyline> _polyline = {};
+  Set<Polyline> _polyline = {};
   TextEditingController location = TextEditingController();
   TextEditingController destination = TextEditingController();
   static LatLng testPosition = LatLng(7.477491, 80.619194);
@@ -36,7 +37,7 @@ class MapSampleState extends State<MapSample> with ChangeNotifier {
   Widget build(BuildContext context) {
     return new Scaffold(
         appBar: AppBar(
-          title: Text('Make a Reservation'),
+          title: Text('Make a Reservation',style: TextStyle(fontFamily: 'Ubuntu',)),
         ),
         body: _initialPosition == null
             ? Container(
@@ -69,7 +70,6 @@ class MapSampleState extends State<MapSample> with ChangeNotifier {
                         color: Colors.white,
                       ),
                       child: TextField(
-                        
                         controller: location,
                         decoration: InputDecoration(
                             suffixIcon: FlatButton(
@@ -107,7 +107,7 @@ class MapSampleState extends State<MapSample> with ChangeNotifier {
                           sendRequest(value);
                         },
                         decoration: InputDecoration(
-                          prefixIcon: Icon(Icons.directions_transit),
+                            prefixIcon: Icon(Icons.directions_transit),
                             hintText: 'Destination',
                             border: InputBorder.none,
                             contentPadding:
@@ -122,7 +122,12 @@ class MapSampleState extends State<MapSample> with ChangeNotifier {
                     child: Container(
                       child: RaisedButton(
                         child: Text('Reserve'),
-                        onPressed: (){},
+                        onPressed: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => BusAvailability(location.text,destination.text)));
+                        },
                       ),
                     ),
                   )
@@ -215,8 +220,6 @@ class MapSampleState extends State<MapSample> with ChangeNotifier {
     double latitude = placemark[0].position.latitude;
     double longtitude = placemark[0].position.longitude;
     LatLng destination = LatLng(latitude, longtitude);
-    
-    
 
     if (isCurrentLocation) {
       print('Current location :::: $_initialPosition');
