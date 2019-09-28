@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class StakedIcons extends StatelessWidget {
   @override
@@ -25,7 +26,7 @@ class StakedIcons extends StatelessWidget {
                       borderRadius: new BorderRadius.circular(50.0),
                       color: Color(0xFFFC6A7F)),
                   child: new Icon(
-                    Icons.home,
+                    Icons.place,
                     color: Colors.white,
                   ),
                 ),
@@ -37,7 +38,7 @@ class StakedIcons extends StatelessWidget {
                       borderRadius: new BorderRadius.circular(50.0),
                       color: Color(0xFFFFCE56)),
                   child: new Icon(
-                    Icons.local_car_wash,
+                    Icons.restore,
                     color: Colors.white,
                   ),
                 ),
@@ -49,7 +50,7 @@ class StakedIcons extends StatelessWidget {
                       borderRadius: new BorderRadius.circular(50.0),
                       color: Color(0xFF45E0EC)),
                   child: new Icon(
-                    Icons.place,
+                    Icons.tram,
                     color: Colors.white,
                   ),
                 )
