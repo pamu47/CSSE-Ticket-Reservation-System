@@ -1,6 +1,8 @@
 import 'package:csse_booking_system/Reservation/mapForReservation.dart';
 import 'package:csse_booking_system/Reservation/newReservation.dart';
 import 'package:csse_booking_system/customWidgets/appDrawer.dart';
+import 'package:csse_booking_system/services/usermanagement.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -13,6 +15,21 @@ class Home extends StatefulWidget {
 }
 
 class HomeState extends State<Home> {
+  BaseAuthentication auth = Authentication();
+  FirebaseAuth fireAuth = FirebaseAuth.instance;
+  
+
+ @override
+  void initState() {
+    super.initState();
+    auth.getCurrentUser().then((currentuser){
+      print('User Id ::::: $currentuser');
+    });
+    Future<FirebaseUser> user = fireAuth.currentUser().then((currentUser){
+      print('User Email :::::: ${currentUser.email}');
+    });
+  }
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
