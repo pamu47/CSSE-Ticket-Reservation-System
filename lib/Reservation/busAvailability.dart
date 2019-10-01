@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:csse_booking_system/Reservation/seatsAvailability.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-
-import 'test.dart';
+import '../customWidgets/customListTile.dart';
 
 class BusAvailability extends StatefulWidget {
   final String source, destination;
@@ -121,23 +121,31 @@ class BusAvailabilityState extends State<BusAvailability> {
                       itemCount: snapshot.data.length,
                       itemBuilder: (_, index) {
                         var busTurn = snapshot.data[index].data["$from-$to"];
-
+                        
                         return Padding(
                           padding: const EdgeInsets.only(left: 5.0, right: 5.0),
-                          child: CustomListItemTwo(
-                            thumbnail: Container(
-                              decoration:
-                                  const BoxDecoration(color: Colors.pink),
+                          child: InkWell(
+                            onTap: () {
+                              Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => SeatsAvailability(snapshot.data[index])));
+                            },
+                            child: CustomListItemTwo(
+                              thumbnail: Container(
+                                decoration:
+                                    const BoxDecoration(color: Colors.pink),
+                              ),
+                              title: '${snapshot.data[index].data["company"]}',
+                              subtitle: '$from : ${busTurn['departure']} \n'
+                                  '$to : ${busTurn['arrival']} \n'
+                                  '${snapshot.data[index].data["options"]}',
+                              author:
+                                  '${busTurn['availableSeats']} Seats Available',
+                              publishDate: 'type',
+                              readDuration:
+                                  'Rs. ${snapshot.data[index].data["price"]} per person',
                             ),
-                            title: '${snapshot.data[index].data["company"]}',
-                            subtitle: '$from : ${busTurn['departure']} \n'
-                                '$to : ${busTurn['arrival']} \n'
-                                '${snapshot.data[index].data["options"]}',
-                            author:
-                                '${busTurn['availableSeats']} Seats Available',
-                            publishDate: 'Dec 28',
-                            readDuration:
-                                'Rs. ${snapshot.data[index].data["price"]} per person',
                           ),
                         );
                       },

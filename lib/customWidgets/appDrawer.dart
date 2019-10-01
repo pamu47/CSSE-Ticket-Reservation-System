@@ -1,24 +1,28 @@
-import 'package:csse_booking_system/services/usermanagement.dart';
+import 'dart:async';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:csse_booking_system/auth/signIn.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-
 class AppDrawer extends StatelessWidget {
-  //static BaseAuthentication auth = Authentication();
-  
-  static FirebaseAuth auth = FirebaseAuth.instance;
-  static String userId;
+  DocumentSnapshot userData;
+    static FirebaseAuth auth = FirebaseAuth.instance;
+  static String userEmail;
+  static String userName;
 
-void getUser()async{
-    final FirebaseUser user = await auth.currentUser();
-    userId = user.uid;
-  }
-  AppDrawer();
-    
+  AppDrawer(this.userData);
 
   @override
   Widget build(BuildContext context) {
+    if(userData != null){
+      userEmail = userData.data['email'];
+      userName = userData.data['name'];
+    }else{
+      userName = 'Loading';
+      userEmail = 'Loading';
+    }
     
     return Drawer(
       child: ListView(
@@ -37,8 +41,9 @@ void getUser()async{
                 //     MaterialPageRoute(builder: (context) => ));
               },
             ),
-            accountEmail: Text("pamuditha@gmail.com"),
-            accountName: Text('abcd::::'),
+            accountEmail:
+                Text('$userEmail'),
+           accountName: Text('$userName'),
             decoration: BoxDecoration(
               color: Color.fromRGBO(18, 69, 89, 1),
             ),
@@ -114,9 +119,15 @@ void getUser()async{
               title: Text('Logout'),
               onTap: () async {
                 Navigator.pop(context);
+
                 // Navigator.push(context,
                 //     MaterialPageRoute(builder: (context) => ));
-                auth.signOut();
+                auth.signOut().then((user) {
+                  Navigator.pop(context);
+
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => Login()));
+                });
               },
             ),
           ),
@@ -125,6 +136,8 @@ void getUser()async{
     );
   }
 }
+
+
 
 Future _buildErrorDialog(BuildContext context, _message) {
   return showDialog(
