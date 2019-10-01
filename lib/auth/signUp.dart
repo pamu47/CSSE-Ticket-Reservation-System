@@ -109,14 +109,14 @@ class SignUpState extends State<SignUp> {
                   child: Text("SignUp"),
                   onPressed: () {
                     if (_formKey.currentState.validate()) {
-
-                      Future<String> user = auth.signUp(
-                          emailController.text, passwordController.text);
+                      Future<String> user = auth
+                          .signUp(emailController.text, passwordController.text,
+                              nameController.text);
+                      
+                      
                       if (user != null) {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => Home()));
+                        Navigator.push(context,
+                            MaterialPageRoute(builder: (context) => Home()));
                       } else {
                         // Have to change
                         //Navigator.pushNamed(context, '/home');
@@ -172,9 +172,7 @@ class SignUpState extends State<SignUp> {
                   color: Colors.red,
                   icon: Icon(FontAwesomeIcons.google), //`Icon` to display
                   label: Text('Continue with Google'), //`Text` to display
-                  onPressed: () {
-
-                  },
+                  onPressed: () {},
                 ),
               ),
               ButtonTheme(
