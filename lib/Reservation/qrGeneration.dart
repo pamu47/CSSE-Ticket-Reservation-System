@@ -17,6 +17,7 @@ class QrGeneration extends StatefulWidget {
 }
 
 class QrGenerationState extends State<QrGeneration> {
+  final GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey<ScaffoldState>();
   String getArrival() {
     String arrival =
         widget.bus.data['${widget.from}-${widget.to}']['arrival'].toString();
@@ -38,25 +39,27 @@ class QrGenerationState extends State<QrGeneration> {
   }
 
   String calcCost() {
-    double cost = double.parse(widget.bus.data['price'].toString()) *
-        double.parse(widget.numberOfTickets.toString());
+    int cost = int.parse(widget.bus.data['price'].toString()) *
+        int.parse(widget.numberOfTickets.toString());
     return cost.toString();
   }
 
-  double calcbalance() {
-    double balance = double.parse(widget.userData.data['credits'].toString()) -
-        double.parse(calcCost().toString());
+  int calcbalance() {
+    int balance = int.parse(widget.userData.data['credits'].toString()) -
+        int.parse(calcCost().toString());
     return balance;
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: scaffoldKey,
       appBar: AppBar(
         title: Text(
           'Get Your Ticket',
           style: TextStyle(fontFamily: 'Ubuntu'),
         ),
+        backgroundColor: Colors.black,
       ),
       body: Container(
         padding: EdgeInsets.all(15.0),
@@ -260,8 +263,8 @@ class QrGenerationState extends State<QrGeneration> {
                   )),
             ),
             Container(
-              height: 250.0,
-              width: 250,
+              height: 200.0,
+              width: 200.0,
               child: Card(
                 elevation: 5.0,
                 child: QrImage(
@@ -387,6 +390,7 @@ class QrGenerationState extends State<QrGeneration> {
                                                   updateCreditLevel();
                                                   createReservation();
                                                   Navigator.pop(context);
+                                                  showSnackBar();
                                                 },
                                               ),
                                             ),
@@ -406,6 +410,26 @@ class QrGenerationState extends State<QrGeneration> {
         ),
       ),
     );
+  }
+
+  showSnackBar() {
+    final snackbar = SnackBar(
+      behavior: SnackBarBehavior.floating,
+      backgroundColor: Colors.black,
+      elevation: 3.0,
+      shape: OutlineInputBorder(
+          borderSide: BorderSide(color: Colors.white),
+          borderRadius: BorderRadius.circular(8.0)),
+      content: new Text(
+        'Reservation Successfull',
+        style: TextStyle(color: Colors.white),
+      ),
+      action: SnackBarAction(
+        label: 'Done',
+        onPressed: () {},
+      ),
+    );
+    scaffoldKey.currentState.showSnackBar(snackbar);
   }
 
   updateSeatCount() async {
@@ -436,10 +460,10 @@ class QrGenerationState extends State<QrGeneration> {
         .document(widget.userData.documentID)
         .collection('records')
         .add({
-          'from-to': '${widget.from}-${widget.to}',
-          'numberOfTickets' :'${widget.numberOfTickets}',
-          'cost': '${calcCost()}'
-        });
+      'from-to': '${widget.from}-${widget.to}',
+      'numberOfTickets': '${widget.numberOfTickets}',
+      'cost': '${calcCost()}'
+    });
   }
 }
 
