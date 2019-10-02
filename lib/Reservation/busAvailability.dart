@@ -121,15 +121,16 @@ class BusAvailabilityState extends State<BusAvailability> {
                       itemCount: snapshot.data.length,
                       itemBuilder: (_, index) {
                         var busTurn = snapshot.data[index].data["$from-$to"];
-                        
+
                         return Padding(
                           padding: const EdgeInsets.only(left: 5.0, right: 5.0),
                           child: InkWell(
                             onTap: () {
                               Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => SeatsAvailability(snapshot.data[index])));
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => SeatsAvailability(
+                                          snapshot.data[index], from, to)));
                             },
                             child: CustomListItemTwo(
                               thumbnail: Container(
@@ -184,15 +185,25 @@ class BusAvailabilityState extends State<BusAvailability> {
   }
 
   Future<List<DocumentSnapshot>> getBusData() async {
+    var busData;
     //print('Called>>>>>>>>>>>>>>');
     var data = await Firestore.instance
         .collection('routes')
-        .document('colombo-kandy')
+        .document('$from-$to')
         .collection('bus')
         .orderBy("$from-$to", descending: false)
         .getDocuments();
-    var busData = data.documents;
-    //print('Called>>>>>>>>>>>>>>${busData[0]['company']}');
+    busData = data.documents;
+    if (data.documents.isEmpty) {
+      var data = await Firestore.instance
+          .collection('routes')
+          .document('$to-$from')
+          .collection('bus')
+          .orderBy("$from-$to", descending: false)
+          .getDocuments();
+      busData = data.documents;
+      
+    }
     return busData;
   }
 }

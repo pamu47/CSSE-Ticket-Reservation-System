@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:csse_booking_system/Payment/creditAccount.dart';
 import 'package:csse_booking_system/Reservation/mapForReservation.dart';
 import 'package:csse_booking_system/Reservation/newReservation.dart';
+import 'package:csse_booking_system/Reservation/reservedTickets.dart';
 import 'package:csse_booking_system/customWidgets/appDrawer.dart';
 import 'package:csse_booking_system/services/usermanagement.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -60,10 +61,10 @@ class HomeState extends State<Home> {
                     height: 150.0,
                     child: InkWell(
                       onTap: () {
-                        Navigator.push(
+                       Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => MapSample()));
+                                builder: (context) => ReservedTickets()));
                       },
                       child: Card(
                         color: Color(0xFF18D191),
