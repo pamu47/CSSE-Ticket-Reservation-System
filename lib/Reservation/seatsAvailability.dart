@@ -1,11 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:csse_booking_system/Reservation/qrGeneration.dart';
 import 'package:csse_booking_system/services/usermanagement.dart';
 import 'package:flutter/material.dart';
 
 class SeatsAvailability extends StatefulWidget {
   final DocumentSnapshot bus;
+  final String from, to;
 
-  SeatsAvailability(this.bus);
+  SeatsAvailability(this.bus, this.from, this.to);
 
   @override
   State<StatefulWidget> createState() {
@@ -38,26 +40,45 @@ class SeatsAvailabilityState extends State<SeatsAvailability> {
       });
     });
     //StripePayment.setSettings(StripeSettings(publishableKey: "pk_test_NwDyNtEZ6cABXYM8OM9eqvsr006ZlfJIbY"));
+    setState(() {
+      tickets.text = '0';
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    print(
+        'Route Data:::::${widget.bus.data['colombo-kandy']['availableSeats'].toString()}');
     return Scaffold(
         appBar: AppBar(
           title: Text(
             'Select Your Seat',
             style: TextStyle(fontFamily: 'Ubuntu'),
           ),
+          backgroundColor: Colors.black,
+          actions: <Widget>[
+            RaisedButton(
+              child: Icon(
+                Icons.refresh,
+                color: Colors.white,
+              ),
+              color: Colors.black,
+              onPressed: () {
+                setState(() {
+                  initState();
+                });
+              },
+            )
+          ],
         ),
         bottomNavigationBar: BottomAppBar(
-          child: Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
+          child: Row(mainAxisAlignment: MainAxisAlignment.center, children: <
+              Widget>[
             ButtonTheme(
               minWidth: 200,
               buttonColor: Colors.black,
               child: RaisedButton(
                 onPressed: () {
-                  // StripePayment.addSource().then((token){
-                  // });
                   showDialog(
                       context: context,
                       builder: (context) {
@@ -106,7 +127,8 @@ class SeatsAvailabilityState extends State<SeatsAvailability> {
                                                     .toString(),
                                             style: TextStyle(
                                                 fontFamily: 'Ubuntu',
-                                                fontWeight: FontWeight.bold),
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 15.0),
                                           ),
                                           flex: 1,
                                         )
@@ -136,12 +158,15 @@ class SeatsAvailabilityState extends State<SeatsAvailability> {
                                         Expanded(
                                           child: Padding(
                                             padding: const EdgeInsets.only(
-                                                left: 8.0),
+                                                left: 10.0),
                                             child: Text(
-                                              'Rs.'+userData.data['credits'].toString(),
+                                              'Rs.' +
+                                                  userData.data['credits']
+                                                      .toString(),
                                               style: TextStyle(
                                                   fontFamily: 'Ubuntu',
-                                                  fontWeight: FontWeight.bold),
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 15.0),
                                             ),
                                           ),
                                           flex: 1,
@@ -169,7 +194,10 @@ class SeatsAvailabilityState extends State<SeatsAvailability> {
                                                   double.parse(widget
                                                       .bus.data['price']
                                                       .toString());
-                                              if(cost < double.parse(userData.data['credits'].toString())){
+                                              if (cost <
+                                                  double.parse(userData
+                                                      .data['credits']
+                                                      .toString())) {
                                                 setState(() {
                                                   hasCredit = true;
                                                 });
@@ -190,6 +218,7 @@ class SeatsAvailabilityState extends State<SeatsAvailability> {
                                           child: Container(
                                             height: 50.0,
                                             child: TextField(
+                                              enabled: false,
                                               textAlign: TextAlign.center,
                                               controller: tickets,
                                               decoration: new InputDecoration(
@@ -208,13 +237,25 @@ class SeatsAvailabilityState extends State<SeatsAvailability> {
                                               size: 30.0,
                                             ),
                                             onPressed: () {
-                                              var count = (int.parse(userData.data['credits'].toString()) / int.parse(widget.bus.data['price'].toString())).toInt();
-                                              if(count > int.parse(tickets.text)){
+                                              var count = (int.parse(userData
+                                                          .data['credits']
+                                                          .toString()) /
+                                                      int.parse(widget
+                                                          .bus.data['price']
+                                                          .toString()))
+                                                  .toInt()
+                                                  .floor();
+                                              // var count = userData
+                                              //             .data['credits'] / widget
+                                              //             .bus.data['price'];
+
+                                              if (count >
+                                                  int.parse(tickets.text)) {
                                                 ticketCount++;
-                                              cost = ticketCount *
-                                                  double.parse(widget
-                                                      .bus.data['price']
-                                                      .toString());
+                                                cost = ticketCount *
+                                                    double.parse(widget
+                                                        .bus.data['price']
+                                                        .toString());
                                               }
                                               setState(() {
                                                 tickets.text =
@@ -230,7 +271,7 @@ class SeatsAvailabilityState extends State<SeatsAvailability> {
                                     children: <Widget>[
                                       Expanded(
                                         child: Padding(
-                                          padding: const EdgeInsets.all(20.0),
+                                          padding: const EdgeInsets.all(10.0),
                                           child: Container(
                                             height: 50.0,
                                             child: TextField(
@@ -253,7 +294,7 @@ class SeatsAvailabilityState extends State<SeatsAvailability> {
                                   ButtonTheme(
                                     minWidth: 200.0,
                                     child: RaisedButton(
-                                      color: Colors.green,
+                                      color: Colors.purple[600],
                                       shape: RoundedRectangleBorder(
                                           borderRadius: BorderRadius.all(
                                               Radius.circular(8.0))),
@@ -262,20 +303,37 @@ class SeatsAvailabilityState extends State<SeatsAvailability> {
                                           mainAxisAlignment:
                                               MainAxisAlignment.center,
                                           children: <Widget>[
-                                            Icon(Icons.attach_money),
-                                            Text('Proceed')
+                                            Icon(
+                                              Icons.forward,
+                                              color: Colors.white,
+                                            ),
+                                            Text(
+                                              'Proceed',
+                                              style: TextStyle(
+                                                  color: Colors.white),
+                                            )
                                           ],
                                         ),
                                       ),
                                       onPressed: () {
                                         Navigator.pop(context);
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    QrGeneration(
+                                                        widget.bus,
+                                                        userData,
+                                                        widget.from,
+                                                        widget.to,
+                                                        tickets.text)));
                                       },
                                     ),
                                   ),
                                   ButtonTheme(
                                     minWidth: 200.0,
                                     child: RaisedButton(
-                                      color: Colors.green,
+                                      color: Colors.purple[600],
                                       shape: RoundedRectangleBorder(
                                           borderRadius: BorderRadius.all(
                                               Radius.circular(8.0))),
@@ -284,12 +342,23 @@ class SeatsAvailabilityState extends State<SeatsAvailability> {
                                           mainAxisAlignment:
                                               MainAxisAlignment.center,
                                           children: <Widget>[
-                                            Icon(Icons.credit_card),
-                                            Text('Credit Your Account')
+                                            Icon(
+                                              Icons.credit_card,
+                                              color: Colors.white,
+                                            ),
+                                            Text(
+                                              'Credit Your Account',
+                                              style: TextStyle(
+                                                  color: Colors.white),
+                                            )
                                           ],
                                         ),
                                       ),
                                       onPressed: () {
+                                        Navigator.popUntil(
+                                            context,
+                                            ModalRoute.withName(
+                                                Navigator.defaultRouteName));
                                         Navigator.pop(context);
                                       },
                                     ),
@@ -299,14 +368,28 @@ class SeatsAvailabilityState extends State<SeatsAvailability> {
                             ));
                       });
                 },
-                child: Text("Proceed",style: TextStyle(color: Colors.white),),
+                child: Text(
+                  "Proceed",
+                  style: TextStyle(color: Colors.white),
+                ),
               ),
             ),
           ]),
-          color: Colors.blue,
+          color: Colors.white,
         ),
         body: ListView(
           children: <Widget>[
+            Align(
+              alignment: Alignment.center,
+              //padding: const EdgeInsets.only(left:10.0),
+              child: Text('${widget.bus.data['company'].toString()}',
+                  style: TextStyle(fontFamily: 'Ubuntu', fontSize: 30.0)),
+            ),
+            Divider(
+              color: Colors.purple[600],
+              endIndent: 20,
+              indent: 20,
+            ),
             getRows(),
             Padding(
               padding: const EdgeInsets.only(right: 20.0, left: 20.0),
@@ -333,11 +416,9 @@ class SeatsAvailabilityState extends State<SeatsAvailability> {
             padding: EdgeInsets.all(4.0),
             child: ButtonTheme(
               minWidth: 30,
-              buttonColor: isPressed ? Colors.green : Colors.grey,
+              buttonColor: Colors.purple[600],
               child: RaisedButton(
-                onPressed: () {
-                  setState(() {});
-                },
+                onPressed: () {},
                 child: Icon(
                   Icons.event_seat,
                   size: 15.0,
@@ -349,6 +430,7 @@ class SeatsAvailabilityState extends State<SeatsAvailability> {
             padding: EdgeInsets.all(4.0),
             child: ButtonTheme(
               minWidth: 30.0,
+              buttonColor: Colors.purple[600],
               child: RaisedButton(
                 onPressed: () {},
                 child: Icon(
@@ -365,6 +447,7 @@ class SeatsAvailabilityState extends State<SeatsAvailability> {
             padding: EdgeInsets.all(4.0),
             child: ButtonTheme(
               minWidth: 30.0,
+              buttonColor: Colors.purple[600],
               child: RaisedButton(
                 onPressed: () {},
                 child: Icon(
@@ -378,6 +461,7 @@ class SeatsAvailabilityState extends State<SeatsAvailability> {
             padding: EdgeInsets.all(4.0),
             child: ButtonTheme(
               minWidth: 30.0,
+              buttonColor: Colors.purple[600],
               child: RaisedButton(
                 onPressed: () {},
                 child: Icon(
