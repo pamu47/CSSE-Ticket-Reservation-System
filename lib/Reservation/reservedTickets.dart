@@ -20,7 +20,6 @@ class ReservedTicketsState extends State<ReservedTickets> {
     auth.getCurrentUser().then((userID){
       currentUser = userID.toString();
     });
-    print('Ticket :::: $currentUser');
   }
   
   @override
