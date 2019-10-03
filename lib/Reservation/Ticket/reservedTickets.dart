@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:csse_booking_system/Reservation/Ticket/ticket.dart';
 import 'package:csse_booking_system/services/usermanagement.dart';
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
@@ -13,15 +16,23 @@ class ReservedTickets extends StatefulWidget {
 class ReservedTicketsState extends State<ReservedTickets> {
   BaseAuthentication auth = Authentication();
   static String currentUser;
+  StreamSubscription<QuerySnapshot> reservationSubscription;
 
   @override
   void initState() {
     super.initState();
-    auth.getCurrentUser().then((userID){
+    auth.getCurrentUser().then((userID) {
       currentUser = userID.toString();
     });
+    reservationSubscription =
+        getTicketData().listen((QuerySnapshot snapshot) {});
   }
-  
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -49,7 +60,8 @@ class ReservedTicketsState extends State<ReservedTickets> {
           ),
           body: TabBarView(
             children: <Widget>[
-              Container(
+              Hero(
+                tag: 'ticket',
                 child: FutureBuilder(
                   future: getReservations(),
                   builder: (_, snapshot) {
@@ -61,8 +73,23 @@ class ReservedTicketsState extends State<ReservedTickets> {
                       return ListView.builder(
                         itemCount: snapshot.data.length,
                         itemBuilder: (_, index) {
+                          var trip =
+                              snapshot.data[index].data['from-to'].toString();
+                          var cost =
+                              snapshot.data[index].data['cost'].toString();
+                          var numberOfTickets = snapshot
+                              .data[index].data['numberOfTickets']
+                              .toString();
+                          var docId = snapshot
+                              .data[index].documentID;
                           return InkWell(
-                            child: customListItem(snapshot.data[index].data['from-to'].toString()),
+                            child: customListItem(trip, cost, numberOfTickets),
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => Ticket(docId,trip,cost,numberOfTickets)));
+                            },
                           );
                         },
                       );
@@ -86,7 +113,22 @@ class ReservedTicketsState extends State<ReservedTickets> {
     return reservationData;
   }
 
-  Widget customListItem(trip) {
+  Stream<QuerySnapshot> getTicketData({int offset, int limit}) {
+    Stream<QuerySnapshot> snapshot = Firestore.instance
+        .collection('reservations')
+        .document('$currentUser')
+        .collection('records')
+        .snapshots();
+    if (offset != null) {
+      snapshot = snapshot.skip(offset);
+    }
+    if (limit != null) {
+      snapshot = snapshot.take(limit);
+    }
+    return snapshot;
+  }
+
+  Widget customListItem(trip, cost, numberOfTickets) {
     return Card(
       child: Row(
         // mainAxisAlignment: MainAxisAlignment.center,
@@ -96,12 +138,40 @@ class ReservedTicketsState extends State<ReservedTickets> {
             flex: 3,
             child: Container(
               child: Column(
-                children: <Widget>[Text('data'), Text('${trip.toString()}')],
+                children: <Widget>[
+                  Text(
+                    '${trip.toString()}',
+                    style: TextStyle(
+                        fontFamily: 'Ubuntu',
+                        fontSize: 20.0,
+                        fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(
+                    height: 10.0,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 40.0),
+                    child: Row(children: <Widget>[
+                      Expanded(
+                        flex: 4,
+                        child: Text(
+                          'Rs.${cost.toString()}',
+                          style: TextStyle(color: Colors.red),
+                        ),
+                      ),
+                      Expanded(
+                        flex: 4,
+                        child: Text('${numberOfTickets.toString()} Ticket(s)',
+                            style: TextStyle(color: Colors.green)),
+                      )
+                    ]),
+                  ),
+                ],
               ),
             ),
           ),
           Expanded(
-            flex: 3,
+            flex: 2,
             child: Container(
               padding: EdgeInsets.only(right: 30.0),
               alignment: Alignment.centerRight,
