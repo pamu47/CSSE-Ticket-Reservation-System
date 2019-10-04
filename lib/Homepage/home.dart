@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:csse_booking_system/Payment/creditAccount.dart';
 import 'package:csse_booking_system/Reservation/mapForReservation.dart';
 import 'package:csse_booking_system/Reservation/newReservation.dart';
-import 'package:csse_booking_system/Reservation/reservedTickets.dart';
+import 'package:csse_booking_system/Reservation/Ticket/reservedTickets.dart';
 import 'package:csse_booking_system/customWidgets/appDrawer.dart';
 import 'package:csse_booking_system/services/usermanagement.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -35,7 +35,6 @@ class HomeState extends State<Home> {
           .document(currentuser)
           .get()
           .then((value) {
-        print('values::::: ${value.data.toString()}');
         ds = value;
       });
     });
@@ -46,7 +45,7 @@ class HomeState extends State<Home> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Home"),
-        backgroundColor: Colors.brown[800],
+        backgroundColor: Colors.black,
       ),
       drawer: AppDrawer(ds),
       body: Container(
