@@ -355,10 +355,13 @@ class SeatsAvailabilityState extends State<SeatsAvailability> {
                                         ),
                                       ),
                                       onPressed: () {
-                                        Navigator.popUntil(
-                                            context,
-                                            ModalRoute.withName(
-                                                Navigator.defaultRouteName));
+                                        // Navigator.popUntil(
+                                        //     context,
+                                        //     ModalRoute.withName(
+                                        //         Navigator.defaultRouteName));
+                                        Navigator.pop(context);
+                                        Navigator.pop(context);
+                                        Navigator.pop(context);
                                         Navigator.pop(context);
                                       },
                                     ),

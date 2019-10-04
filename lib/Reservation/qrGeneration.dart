@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
@@ -386,6 +387,11 @@ class QrGenerationState extends State<QrGeneration> {
                                                   ),
                                                 ),
                                                 onPressed: () {
+                                                  String msg =
+                                                      'Your reservation is successfull\nFrom : ${widget.from} To:${widget.to}\n Time : ${getDeparture()} - ${getArrival()}\nCost : ${calcCost()}\n -Thanks for using Smart Partner-';
+                                                  sendConfirmation(msg).then((data){
+                                                    print('Confirmation message :: ${data.toString()}');
+                                                  });
                                                   updateSeatCount();
                                                   updateCreditLevel();
                                                   createReservation();
@@ -464,6 +470,15 @@ class QrGenerationState extends State<QrGeneration> {
       'numberOfTickets': '${widget.numberOfTickets}',
       'cost': '${calcCost()}'
     });
+  }
+
+  Future<String> sendConfirmation(String msg) async {
+    final HttpsCallable callable = CloudFunctions.instance
+        .getHttpsCallable(functionName: 'bookingConfirmationMsg');
+   Map<String, dynamic> data = new Map();
+   data['message'] = msg;
+    HttpsCallableResult result = await callable.call(data);
+    return result.data.toString();
   }
 }
 
