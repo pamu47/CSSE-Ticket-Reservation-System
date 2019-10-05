@@ -16,7 +16,6 @@ class ReservedTickets extends StatefulWidget {
 class ReservedTicketsState extends State<ReservedTickets> {
   BaseAuthentication auth = Authentication();
   static String currentUser;
-  StreamSubscription<QuerySnapshot> reservationSubscription;
 
   @override
   void initState() {
@@ -24,8 +23,7 @@ class ReservedTicketsState extends State<ReservedTickets> {
     auth.getCurrentUser().then((userID) {
       currentUser = userID.toString();
     });
-    reservationSubscription =
-        getTicketData().listen((QuerySnapshot snapshot) {});
+
   }
 
   @override
@@ -88,7 +86,7 @@ class ReservedTicketsState extends State<ReservedTickets> {
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => Ticket(docId,trip,cost,numberOfTickets)));
+                                      builder: (context) => Ticket(currentUser,docId,trip,cost,numberOfTickets)));
                             },
                           );
                         },
