@@ -36,6 +36,7 @@ class MyAppState extends State<MyApp> {
       } else {
         print('Current User :::::  $currentUser');
         Timer(Duration(seconds: 5), () {
+          Navigator.of(context).pop();
           Navigator.push(
               context, MaterialPageRoute(builder: (context) => Home()));
         });

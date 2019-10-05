@@ -47,8 +47,6 @@ class SeatsAvailabilityState extends State<SeatsAvailability> {
 
   @override
   Widget build(BuildContext context) {
-    print(
-        'Route Data:::::${widget.bus.data['colombo-kandy']['availableSeats'].toString()}');
     return Scaffold(
         appBar: AppBar(
           title: Text(
