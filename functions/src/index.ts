@@ -32,16 +32,26 @@ exports.bookingConfirmationMsg = functions.https.onCall((data, context) => {
 
 
 export const sendToDevice = functions.firestore
-.document('reservations/{reservationId}/{records}/{recordsId}')
-.onUpdate((change,context) => {
-    const token = keys.token;
-    const payload : admin.messaging.MessagingPayload = {
-        notification: {
-            title: 'You are on your way',
-            body: 'Please do not remove your ticket until you reach the destination. ',
-            clickAction: 'FLUTTER_NOTIFICTION_CLICK'
-
+    .document('reservations/{reservationId}/{records}/{recordsId}')
+    .onUpdate(async (change, context) => {
+        const newData = change.after.data();
+        if (newData != null) {
+            const userId = newData.uid;
+            const querySnapshot = await admin.firestore().collection('users')
+                .doc(userId).collection('tokens').get();
+            const token = querySnapshot.docs.map(snap => snap.id);
+            const payload: admin.messaging.MessagingPayload = {
+                notification: {
+                    title: 'You are on your way',
+                    body: 'Please do not remove your ticket until you reach the destination. ',
+                    clickAction: 'FLUTTER_NOTIFICATION_CLICK'
+                }
+            };
+            return fcm.sendToDevice(token, payload);
         }
-    };
-    return fcm.sendToDevice(token, payload);
-});
+        else {
+            return {
+                error: 'Something went wrong'
+            }
+        }
+    });
