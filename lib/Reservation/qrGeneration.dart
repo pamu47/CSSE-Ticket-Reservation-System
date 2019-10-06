@@ -270,7 +270,7 @@ class QrGenerationState extends State<QrGeneration> {
                 elevation: 5.0,
                 child: QrImage(
                   data:
-                      "${calcCost().toString()} :::: ${calcbalance().toString()}",
+                      "${widget.userData.documentID} :::: ${widget.bus.documentID} :::: ${widget.from}-${widget.to} ::::: ${calcCost()}::::: ${widget.numberOfTickets}",
                   version: QrVersions.auto,
                   size: 200.0,
                 ),
@@ -389,8 +389,10 @@ class QrGenerationState extends State<QrGeneration> {
                                                 onPressed: () {
                                                   String msg =
                                                       'Your reservation is successfull\nFrom : ${widget.from} To:${widget.to}\n Time : ${getDeparture()} - ${getArrival()}\nCost : ${calcCost()}\n -Thanks for using Smart Partner-';
-                                                  sendConfirmation(msg).then((data){
-                                                    print('Confirmation message :: ${data.toString()}');
+                                                  sendConfirmation(msg)
+                                                      .then((data) {
+                                                    print(
+                                                        'Confirmation message :: ${data.toString()}');
                                                   });
                                                   updateSeatCount();
                                                   updateCreditLevel();
@@ -468,6 +470,8 @@ class QrGenerationState extends State<QrGeneration> {
         .add({
       'from-to': '${widget.from}-${widget.to}',
       'numberOfTickets': '${widget.numberOfTickets}',
+      'uid': '${widget.userData.documentID}',
+      'tripStatus': 'pending',
       'cost': '${calcCost()}'
     });
   }
@@ -475,8 +479,8 @@ class QrGenerationState extends State<QrGeneration> {
   Future<String> sendConfirmation(String msg) async {
     final HttpsCallable callable = CloudFunctions.instance
         .getHttpsCallable(functionName: 'bookingConfirmationMsg');
-   Map<String, dynamic> data = new Map();
-   data['message'] = msg;
+    Map<String, dynamic> data = new Map();
+    data['message'] = msg;
     HttpsCallableResult result = await callable.call(data);
     return result.data.toString();
   }

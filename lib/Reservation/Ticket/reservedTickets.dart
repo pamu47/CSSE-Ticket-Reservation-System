@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:csse_booking_system/Reservation/Ticket/ticket.dart';
 import 'package:csse_booking_system/services/usermanagement.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
@@ -16,6 +18,8 @@ class ReservedTickets extends StatefulWidget {
 class ReservedTicketsState extends State<ReservedTickets> {
   BaseAuthentication auth = Authentication();
   static String currentUser;
+  final FirebaseMessaging _fcm = FirebaseMessaging();
+  FutureBuilder futureBuilder;
 
   @override
   void initState() {
@@ -23,18 +27,36 @@ class ReservedTicketsState extends State<ReservedTickets> {
     auth.getCurrentUser().then((userID) {
       currentUser = userID.toString();
     });
+    _saveToken();
+  }
 
+  _saveToken() async {
+    String uid = currentUser;
+    String fcmToken = await _fcm.getToken();
+    if (fcmToken != null) {
+      var tokenRef = Firestore.instance
+          .collection('users')
+          .document(uid)
+          .collection('tokens')
+          .document(fcmToken);
+      await tokenRef.setData({
+        'token': fcmToken,
+        'createdAt': FieldValue.serverTimestamp(),
+        'platform': Platform.operatingSystem
+      });
+    }
   }
 
   @override
   void dispose() {
     super.dispose();
+    getCompletedList();
   }
 
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-        length: 2,
+        length: 3,
         child: Scaffold(
           appBar: AppBar(
             backgroundColor: Colors.black,
@@ -43,6 +65,10 @@ class ReservedTicketsState extends State<ReservedTickets> {
                 Tab(
                   icon: Icon(Icons.panorama_horizontal),
                   text: "View Tickets",
+                ),
+                Tab(
+                  icon: Icon(Icons.train),
+                  text: "Ongoing Trips",
                 ),
                 Tab(
                   icon: Icon(Icons.history),
@@ -78,15 +104,15 @@ class ReservedTicketsState extends State<ReservedTickets> {
                           var numberOfTickets = snapshot
                               .data[index].data['numberOfTickets']
                               .toString();
-                          var docId = snapshot
-                              .data[index].documentID;
+                          var docId = snapshot.data[index].documentID;
                           return InkWell(
                             child: customListItem(trip, cost, numberOfTickets),
                             onTap: () {
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => Ticket(currentUser,docId,trip,cost,numberOfTickets)));
+                                      builder: (context) => Ticket(currentUser,
+                                          docId, trip, cost, numberOfTickets)));
                             },
                           );
                         },
@@ -95,10 +121,95 @@ class ReservedTicketsState extends State<ReservedTickets> {
                   },
                 ),
               ),
-              Icon(Icons.add_comment)
+              //Second Tab
+              FutureBuilder(
+                future: getOngoingTickets(),
+                builder: (context, asyncSnapshot) {
+                  if (asyncSnapshot.connectionState ==
+                      ConnectionState.waiting) {
+                    return Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  } else if (asyncSnapshot.hasError) {
+                    return Center(
+                      child: Text('Error'),
+                    );
+                  } else {
+                    print('Data::: ${asyncSnapshot.data.toString()}');
+                    return ListView.builder(
+                      itemCount: asyncSnapshot.data.length,
+                      itemBuilder: (_, index) {
+                        var trip = asyncSnapshot.data[index].data['from-to']
+                            .toString();
+                        var cost =
+                            asyncSnapshot.data[index].data['cost'].toString();
+                        var numberOfTickets = asyncSnapshot
+                            .data[index].data['numberOfTickets']
+                            .toString();
+                        var docId = asyncSnapshot.data[index].documentID;
+                        return InkWell(
+                          child: customListItem(trip, cost, numberOfTickets),
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => Ticket(currentUser,
+                                        docId, trip, cost, numberOfTickets)));
+                          },
+                        );
+                      },
+                    );
+                  }
+                },
+              ),
+              //Third Tab
+              FutureBuilder(
+                future: getCompletedTickets(),
+                builder: (context, asyncSnapshot) {
+                  if (asyncSnapshot.connectionState ==
+                      ConnectionState.waiting) {
+                    return Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  } else if (asyncSnapshot.hasError) {
+                    return Center(
+                      child: Text('Error'),
+                    );
+                  } else {
+                    print('Data::: ${asyncSnapshot.data.toString()}');
+                    return ListView.builder(
+                      itemCount: asyncSnapshot.data.length,
+                      itemBuilder: (_, index) {
+                        var trip = asyncSnapshot.data[index].data['from-to']
+                            .toString();
+                        var cost =
+                            asyncSnapshot.data[index].data['cost'].toString();
+                        var numberOfTickets = asyncSnapshot
+                            .data[index].data['numberOfTickets']
+                            .toString();
+                        var docId = asyncSnapshot.data[index].documentID;
+                        return InkWell(
+                          child: customListItem(trip, cost, numberOfTickets),
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => Ticket(currentUser,
+                                        docId, trip, cost, numberOfTickets)));
+                          },
+                        );
+                      },
+                    );
+                  }
+                },
+              ),
             ],
           ),
         ));
+  }
+
+  Widget getCompletedList() {
+    return StreamBuilder();
   }
 
   Future<List<DocumentSnapshot>> getReservations() async {
@@ -106,6 +217,31 @@ class ReservedTicketsState extends State<ReservedTickets> {
         .collection('reservations')
         .document('$currentUser')
         .collection('records')
+        .where('tripStatus', isEqualTo: 'pending')
+        .getDocuments();
+    var reservationData = data.documents;
+    return reservationData;
+  }
+
+  Future<List<DocumentSnapshot>> getOngoingTickets(
+      {int offset, int limit}) async {
+    var data = await Firestore.instance
+        .collection('reservations')
+        .document('$currentUser')
+        .collection('records')
+        .where('tripStatus', isEqualTo: 'ongoing')
+        .getDocuments();
+    var reservationData = data.documents;
+    return reservationData;
+  }
+
+  Future<List<DocumentSnapshot>> getCompletedTickets(
+      {int offset, int limit}) async {
+    var data = await Firestore.instance
+        .collection('reservations')
+        .document('$currentUser')
+        .collection('records')
+        .where('tripStatus', isEqualTo: 'finished')
         .getDocuments();
     var reservationData = data.documents;
     return reservationData;

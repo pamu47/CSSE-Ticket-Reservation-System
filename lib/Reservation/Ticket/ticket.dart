@@ -44,9 +44,12 @@ class TicketState extends State<Ticket> {
         showDialog(
             context: context,
             builder: (context) => AlertDialog(
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(32.0))),
                   content: ListTile(
-                    title: Text(message['notification']['title']),
-                    subtitle: Text(message['notification']['body']),
+                    leading: getAssetImage(),
+                    title: Text(message['notification']['title'],style: TextStyle(fontFamily: 'Ubuntu',fontSize: 18.0,fontWeight: FontWeight.bold),),
+                    subtitle: Text(message['notification']['body'],style: TextStyle(fontFamily: 'Ubuntu'),)
                   ),
                   actions: <Widget>[
                     FlatButton(
@@ -63,25 +66,17 @@ class TicketState extends State<Ticket> {
         print("onLaunch: $message");
       },
     );
-    _saveToken();
+  }
+    Widget getAssetImage() {
+    AssetImage assetImage = AssetImage('images/place.png');
+    Image image = Image(
+      image: assetImage,
+      width: 75.0,
+      height: 75.0,
+    );
+    return Container(child: image);
   }
 
-  _saveToken() async {
-    String uid = widget.currentUser;
-    String fcmToken = await _fcm.getToken();
-    if (fcmToken != null) {
-      var tokenRef = Firestore.instance
-          .collection('users')
-          .document(uid)
-          .collection('tokens')
-          .document(fcmToken);
-      await tokenRef.setData({
-        'token': fcmToken,
-        'createdAt': FieldValue.serverTimestamp(),
-        'platform': Platform.operatingSystem
-      });
-    }
-  }
 
   @override
   void dispose() {

@@ -40,14 +40,29 @@ export const sendToDevice = functions.firestore
             const querySnapshot = await admin.firestore().collection('users')
                 .doc(userId).collection('tokens').get();
             const token = querySnapshot.docs.map(snap => snap.id);
-            const payload: admin.messaging.MessagingPayload = {
-                notification: {
-                    title: 'You are on your way',
-                    body: 'Please do not remove your ticket until you reach the destination. ',
-                    clickAction: 'FLUTTER_NOTIFICATION_CLICK'
+            if (newData.tripStatus == 'ongoing') {
+                const payload: admin.messaging.MessagingPayload = {
+                    notification: {
+                        title: 'You are on your way',
+                        body: 'Please do not remove your ticket until you reach the destination. ',
+                        clickAction: 'FLUTTER_NOTIFICATION_CLICK'
+                    }
+                };
+                return fcm.sendToDevice(token, payload);
+            } else if (newData.tripStatus == 'finished') {
+                const payload: admin.messaging.MessagingPayload = {
+                    notification: {
+                        title: 'Trip Completed',
+                        body: 'Thanks for using Smart Partner. Have a Nice Day..! ',
+                        clickAction: 'FLUTTER_NOTIFICATION_CLICK'
+                    }
+                };
+                return fcm.sendToDevice(token, payload);
+            } else {
+                return {
+                    error: 'Something went wrong'
                 }
-            };
-            return fcm.sendToDevice(token, payload);
+            }
         }
         else {
             return {
