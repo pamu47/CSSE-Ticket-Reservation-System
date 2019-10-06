@@ -160,7 +160,10 @@ class LoginState extends State<Login> {
             context, MaterialPageRoute(builder: (context) => Home()));
       } else {
         print("User id is null");
+        _buildErrorDialog(context, 'Please check your credentials');
       }
+    }).catchError((error){
+      _buildErrorDialog(context, error);
     });
   }
 }
@@ -170,7 +173,7 @@ Future _buildErrorDialog(BuildContext context, _message) {
     builder: (context) {
       return AlertDialog(
         title: Text('Error Message'),
-        content: Text(_message),
+        content: Text(_message.toString()),
         actions: <Widget>[
           FlatButton(
               child: Text('Cancel'),

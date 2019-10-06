@@ -35,7 +35,7 @@ class Authentication implements BaseAuthentication {
     FirebaseUser user = (await _firebaseAuth.createUserWithEmailAndPassword(
             email: email, password: password))
         .user;
-    Firestore.instance.collection('users').document(user.uid).setData({'uid':user.uid,'email':email,'name':name});
+    Firestore.instance.collection('users').document(user.uid).setData({'uid':user.uid,'email':email,'name':name,'credits':1500});
     return user.uid;
   }
 }
